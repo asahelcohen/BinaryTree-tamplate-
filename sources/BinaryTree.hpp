@@ -1,7 +1,6 @@
 #ifndef BTREE_H
 #define BTREE_H
 
-
 //#pragma once
 #include <iostream>
 #include <fstream>
@@ -17,34 +16,62 @@
 // אופרטור פלט
 namespace ariel
 {
-template<typename T>
-struct Node
-{
-public:
-    T data;
-    Node<T> *left;
-    Node<T> *right;
-
-    Node<T>(T data)
+    template <typename T>
+    struct Node
     {
-        this->data = data;
-        left = right = nullptr;
+    public:
+        T data;
+        Node<T> *left;
+        Node<T> *right;
+
+        Node<T>(T data)
+        {
+            this->data = data;
+            left = right = nullptr;
+        }
+    };
+
+    template <typename T>
+    class BinaryTree
+    {
+    private:
+        Node<T> *root;
+
+    public:
+        BinaryTree();
+
+        BinaryTree<T> &add_root(T i);
+        BinaryTree<T> *add_left(T i, T j);
+        BinaryTree<T> *add_right(T i, T j);
+    };
+    template <typename T>
+    BinaryTree<T>::BinaryTree()
+    {
+        root = nullptr;
     }
-};
 
-template<typename T>
-class BinaryTree
-{
-private:
-    Node<T> *root;
+    template <typename T>
+    BinaryTree<T> &BinaryTree<T>::add_root(T i)
+    {
+        // if(this->root == nullptr){
+        //     this->root.data = i;
+        return *this;
+        // }
+        // Node<T> temp = new Node<T>(i);
+        // this->root = temp;
+        // return temp;
+    }
 
-public:
-    BinaryTree ();
+    template <typename T>
+    BinaryTree<T> *BinaryTree<T>::add_left(T i, T j)
+    {
+        return this->root;
+    }
 
-    Node<T> *add_root(T i);
-    Node<T> *add_left(T i);
-    Node<T> *add_right(T i);
-
-};
+    template <typename T>
+    BinaryTree<T> *BinaryTree<T>::add_right(T i, T j)
+    {
+        return this->root;
+    }
 }
 #endif
