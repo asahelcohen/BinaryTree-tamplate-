@@ -10,10 +10,6 @@
 #include <sstream>
 #include <stdexcept>
 
-// begin_preorder(), end_preorder()
-// begin_inorder(), end_inorder()
-// begin_postorder(), end_postorder()
-// אופרטור פלט
 namespace ariel
 {
     template <typename T>
@@ -41,8 +37,92 @@ namespace ariel
         BinaryTree();
 
         BinaryTree<T> &add_root(T i);
-        BinaryTree<T> *add_left(T i, T j);
-        BinaryTree<T> *add_right(T i, T j);
+        BinaryTree<T> &add_left(T i, T j);
+        BinaryTree<T> &add_right(T i, T j);
+
+        class iterator
+        {
+        private:
+            Node<T> *pointer_to_current_node;
+
+        public:
+            iterator(Node<T> *ptr = nullptr)
+                : pointer_to_current_node(ptr)
+            {
+            }
+
+            T &operator*() const
+            {
+                return pointer_to_current_node->data;
+            }
+
+            iterator &operator++()
+            {
+                pointer_to_current_node = pointer_to_current_node->left;
+            }
+
+            const iterator operator++(int)
+            {
+                iterator temp = *this;
+                pointer_to_current_node = pointer_to_current_node->left;
+                return temp;
+            }
+
+            bool operator==(const iterator &it) const
+            {
+                return pointer_to_current_node == it.pointer_to_current_node;
+            }
+
+            bool operator!=(const iterator &it) const
+            {
+                return pointer_to_current_node != it.pointer_to_current_node;
+            }
+
+            friend std::ostream &operator<<(std::ostream &os, const BinaryTree &b);
+        };
+        // begin_preorder(), end_preorder()
+        // begin_inorder(), end_inorder()
+        // begin_postorder(), end_postorder()
+        // אופרטור פלט
+        iterator begin()
+        {
+            return iterator(root);
+        }
+
+        iterator end()
+        {
+            return iterator(root);
+        }
+
+        iterator begin_preorder()
+        {
+            return iterator(root);
+        }
+
+        iterator end_preorder()
+        {
+            return iterator(root);
+        }
+
+        iterator begin_inorder()
+        {
+            return iterator(root);
+        }
+
+        iterator end_inorder()
+        {
+            return iterator(root);
+        }
+
+        iterator begin_postorder()
+        {
+            return iterator(root);
+        }
+
+        iterator end_postorder()
+        {
+            return iterator(root);
+        }
     };
     template <typename T>
     BinaryTree<T>::BinaryTree()
@@ -55,7 +135,7 @@ namespace ariel
     {
         // if(this->root == nullptr){
         //     this->root.data = i;
-        return *this;
+        return &this;
         // }
         // Node<T> temp = new Node<T>(i);
         // this->root = temp;
@@ -63,15 +143,21 @@ namespace ariel
     }
 
     template <typename T>
-    BinaryTree<T> *BinaryTree<T>::add_left(T i, T j)
+    BinaryTree<T> &BinaryTree<T>::add_left(T i, T j)
     {
-        return this->root;
+        return &this;
     }
 
     template <typename T>
-    BinaryTree<T> *BinaryTree<T>::add_right(T i, T j)
+    BinaryTree<T> &BinaryTree<T>::add_right(T i, T j)
     {
-        return this->root;
+        return &this;
+    }
+
+    template <typename T>
+    std::ostream &operator<<(std::ostream &os, const BinaryTree<T> &bt)
+    {
+        return os;
     }
 }
 #endif
