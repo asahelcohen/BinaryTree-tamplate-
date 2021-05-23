@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <stdexcept>
+#include <map>
 
 namespace ariel
 {
@@ -32,6 +33,7 @@ namespace ariel
     {
     private:
         Node<T> *root;
+        std::map<int, double> nodes;
 
     public:
         BinaryTree();
@@ -39,6 +41,9 @@ namespace ariel
         BinaryTree<T> &add_root(T i);
         BinaryTree<T> &add_left(T i, T j);
         BinaryTree<T> &add_right(T i, T j);
+        Node<T> &get_root();
+        bool contains(Node<T>, T);
+        bool containSub(Node<T>, T);
 
         class iterator
         {
@@ -59,6 +64,7 @@ namespace ariel
             iterator &operator++()
             {
                 pointer_to_current_node = pointer_to_current_node->left;
+                return *this;
             }
 
             const iterator operator++(int)
@@ -131,11 +137,21 @@ namespace ariel
     }
 
     template <typename T>
+    Node<T> &BinaryTree<T>::get_root()
+    {
+        if (this->root)
+        {
+            return *this->root;
+        }
+        throw("there is no root for this tree");
+    }
+
+    template <typename T>
     BinaryTree<T> &BinaryTree<T>::add_root(T i)
     {
         // if(this->root == nullptr){
         //     this->root.data = i;
-        return &this;
+        return *this;
         // }
         // Node<T> temp = new Node<T>(i);
         // this->root = temp;
@@ -145,13 +161,63 @@ namespace ariel
     template <typename T>
     BinaryTree<T> &BinaryTree<T>::add_left(T i, T j)
     {
-        return &this;
+        return *this;
     }
 
     template <typename T>
     BinaryTree<T> &BinaryTree<T>::add_right(T i, T j)
     {
-        return &this;
+        return *this;
+    }
+
+    template <typename T>
+    bool contains(Node<T> root, T n)
+    {
+        if (root.data == nullptr)
+        {
+            return false;
+        }
+        if (root.data == n)
+        {
+            return true;
+        }
+        else
+        {
+            if (root.left != nullptr)
+            {
+                return (containSub(root.left, n));
+            }
+            if (root.right != nullptr)
+            {
+                return (containSub(root.right, n));
+            }
+        }
+        return false;
+    }
+
+    template <typename T>
+    bool containSub(Node<T> curNode, T n)
+    {
+        if (curNode.data == nullptr)
+        {
+            return false;
+        }
+        if (curNode.data == n)
+        {
+            return true;
+        }
+        else
+        {
+            if (curNode.left != nullptr)
+            {
+                return (containSub(curNode.left, n));
+            }
+            if (curNode.right != nullptr)
+            {
+                return (containSub(curNode.right, n));
+            }
+        }
+        return false;
     }
 
     template <typename T>
