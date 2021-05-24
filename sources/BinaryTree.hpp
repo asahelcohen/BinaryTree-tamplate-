@@ -171,27 +171,27 @@ namespace ariel
     }
 
     template <typename T>
-    bool contains(Node<T> root, T n)
+    bool contains(Node<T> *root, T n)
     {
-        if (root.data == nullptr)
-        {
-            return false;
-        }
-        if (root.data == n)
-        {
-            return true;
-        }
-        else
-        {
-            if (root.left != nullptr)
-            {
-                return (containSub(root.left, n));
-            }
-            if (root.right != nullptr)
-            {
-                return (containSub(root.right, n));
-            }
-        }
+        // if (root->data == nullptr)
+        // {
+        //     return false;
+        // }
+        // if (root->data == n)
+        // {
+        //     return true;
+        // }
+        // else
+        // {
+        //     if (root->left != nullptr)
+        //     {
+        //         return (containSub(root->left, n));
+        //     }
+        //     if (root->right != NULL)
+        //     {
+        //         return (containSub(root->right, n));
+        //     }
+        // }
         return false;
     }
 
