@@ -61,6 +61,11 @@ namespace ariel
                 return pointer_to_current_node->data;
             }
 
+            T *operator->() const
+            {
+                return &(pointer_to_current_node->data);
+            }
+
             iterator &operator++()
             {
                 pointer_to_current_node = pointer_to_current_node->left;
