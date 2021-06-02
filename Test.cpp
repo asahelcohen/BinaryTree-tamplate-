@@ -557,6 +557,14 @@ public:
     {
         return (i == a.i);
     }
+    bool operator>(const test_object &a) const
+    {
+        return (i > a.i);
+    }
+    bool operator<(const test_object &a) const
+    {
+        return (i < a.i);
+    }
 };
 
 TEST_CASE("OBJECT BT basic")
