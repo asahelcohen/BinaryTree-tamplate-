@@ -1,7 +1,6 @@
 #ifndef BTREE_H
 #define BTREE_H
 
-//#pragma once
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -125,35 +124,32 @@ namespace ariel
 
         static void createPreorderVec(Node **node, std::vector<Node *> &vec)
         {
-            if (node != nullptr)
+            if (*node != nullptr)
             {
                 vec.push_back(*node);
                 createPreorderVec(&(*node)->left, vec);
                 createPreorderVec(&(*node)->right, vec);
             }
-            return;
         }
 
         static void createInorderVec(Node **node, std::vector<Node *> &vec)
         {
-            if (node != nullptr)
+            if (*node != nullptr)
             {
-                createPreorderVec(&(*node)->left, vec);
+                createInorderVec(&(*node)->left, vec);
                 vec.push_back(*node);
-                createPreorderVec(&(*node)->right, vec);
+                createInorderVec(&(*node)->right, vec);
             }
-            return;
         }
 
         static void createpostorderVec(Node **node, std::vector<Node *> &vec)
         {
-            if (node != nullptr)
+            if (*node != nullptr)
             {
-                createPreorderVec(&(*node)->left, vec);
-                createPreorderVec(&(*node)->right, vec);
+                createpostorderVec(&(*node)->left, vec);
+                createpostorderVec(&(*node)->right, vec);
                 vec.push_back(*node);
             }
-            return;
         }
 
     public:
@@ -284,8 +280,7 @@ namespace ariel
 
             iterator &operator++()
             {
-                index++;
-                pointer_to_current_node = vec.at(index);
+                pointer_to_current_node = vec.at(++index);
                 return *this;
             }
 
@@ -349,4 +344,3 @@ namespace ariel
     };
 }
 #endif
-
