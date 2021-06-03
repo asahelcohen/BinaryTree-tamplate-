@@ -14,46 +14,262 @@
 namespace ariel
 {
     template <typename T>
-    struct Node
-    {
-    public:
-        T data;
-        Node<T> *left;
-        Node<T> *right;
-
-        Node<T>(T data)
-        {
-            this->data = data;
-            left = right = nullptr;
-        }
-    };
-
-    template <typename T>
     class BinaryTree
     {
-    private:
-        Node<T> *root;
-        std::map<int, double> nodes;
+        struct Node
+        {
+            T data;
+            Node *left;
+            Node *right;
+            Node(const T &c) : data(c), right(nullptr), left(nullptr) {}
+            ~Node()
+            {
+                delete right;
+                delete left;
+            }
+
+        public:
+            Node(const Node &unq) : data(unq.data)
+            {
+                if (unq.right)
+                {
+                    right = new Node(*unq.right);
+                }
+                else
+                {
+                    right = nullptr;
+                }
+                if (unq.left)
+                {
+                    left = new Node(*unq.left);
+                }
+                else
+                {
+                    left = nullptr;
+                }
+            }
+
+            Node &operator=(Node other)
+            {
+                if (this != &other)
+                {
+
+                    delete left;
+                    delete right;
+                    data = other.data;
+
+                    if (other.right)
+                    {
+                        right = new Node(*other.right);
+                    }
+                    else
+                    {
+                        right = nullptr;
+                    }
+                    if (other.left)
+                    {
+                        left = new Node(*other.left);
+                    }
+                    else
+                    {
+                        left = nullptr;
+                    }
+                }
+                return *this;
+            }
+            Node(Node &&other)
+            {
+                data = other.data;
+                left = other.left;
+                right = other.right;
+                other.data = nullptr;
+                other.left = nullptr;
+                other.right = nullptr;
+            }
+            Node &operator=(Node &&other)
+            {
+                if (left)
+                    delete left;
+                if (right)
+                    delete right;
+                if (data)
+                    delete data;
+                data = other.data;
+                left = other.left;
+                right = other.right;
+                other.data = nullptr;
+                other.left = nullptr;
+                other.right = nullptr;
+            }
+        };
+        Node *root;
+        Node *retriveNode(Node *curNode, T i)
+        {
+            if (curNode == nullptr)
+            {
+                return nullptr;
+            }
+            if (curNode->data == i)
+            {
+                return curNode;
+            }
+
+            Node *nextNode = retriveNode(curNode->right, i);
+            if (nextNode == nullptr)
+            {
+                return retriveNode(curNode->left, i);
+            }
+
+            return nextNode;
+        }
+
+        static void createPreorderVec(Node **node, std::vector<Node *> &vec)
+        {
+            if (node != nullptr)
+            {
+                vec.push_back(*node);
+                createPreorderVec(&(*node)->left, vec);
+                createPreorderVec(&(*node)->right, vec);
+            }
+            return;
+        }
+
+        static void createInorderVec(Node **node, std::vector<Node *> &vec)
+        {
+            if (node != nullptr)
+            {
+                createPreorderVec(&(*node)->left, vec);
+                vec.push_back(*node);
+                createPreorderVec(&(*node)->right, vec);
+            }
+            return;
+        }
+
+        static void createpostorderVec(Node **node, std::vector<Node *> &vec)
+        {
+            if (node != nullptr)
+            {
+                createPreorderVec(&(*node)->left, vec);
+                createPreorderVec(&(*node)->right, vec);
+                vec.push_back(*node);
+            }
+            return;
+        }
 
     public:
-        BinaryTree();
+        BinaryTree() : root(nullptr) {}
 
-        BinaryTree<T> &add_root(T i);
-        BinaryTree<T> &add_left(T i, T j);
-        BinaryTree<T> &add_right(T i, T j);
-        Node<T> &get_root();
-        bool contains(Node<T>, T);
-        bool containSub(Node<T>, T);
+        BinaryTree &add_root(T i)
+        {
+            if (this->root == nullptr)
+            {
+                this->root = new Node{i};
+                return *this;
+            }
+            this->root->data = i;
+            return *this;
+        }
+        BinaryTree &add_left(T i, T j)
+        {
+            Node *temp = retriveNode(root, i);
+            if (temp)
+            {
+                if (temp->left == nullptr)
+                {
+                    temp->left = new Node(j);
+                }
+                else
+                    temp->left->data = j;
+                return *this;
+            }
+            throw("tree does not contain node");
+        }
+        BinaryTree &add_right(T i, T j)
+        {
+            Node *temp = retriveNode(root, i);
+            if (temp)
+            {
+                if (temp->right == nullptr)
+                {
+                    temp->right = new Node(j);
+                }
+                else
+                    temp->right->data = j;
+                return *this;
+            }
+            throw("tree does not contain node");
+        }
+        ~BinaryTree() { delete root; }
+
+        BinaryTree(const BinaryTree &unq) : root(unq.root)
+        {
+            if (unq.root)
+            {
+                root = new Node(*unq.right);
+            }
+            else
+            {
+                root = nullptr;
+            }
+        }
+        Node &operator=(Node other)
+        {
+            if (this != &other)
+            {
+
+                delete root;
+                root = other.root;
+            }
+            return *this;
+        }
+        BinaryTree(BinaryTree &&other)
+        {
+            root = other.root;
+            other.root = nullptr;
+        }
+        BinaryTree &operator=(BinaryTree &&other)
+        {
+            if (root)
+                delete root;
+            root = other.root;
+            other.root = nullptr;
+        }
+
+        friend std::ostream &operator<<(std::ostream &os, const BinaryTree<T> &bt)
+        {
+            return os;
+        }
 
         class iterator
         {
         private:
-            Node<T> *pointer_to_current_node;
+            Node *pointer_to_current_node;
+            std::vector<Node *> vec;
+            int sort;
+            unsigned long index;
 
         public:
-            iterator(Node<T> *ptr = nullptr)
-                : pointer_to_current_node(ptr)
+            iterator(Node *ptr = nullptr, int sort = 0)
+                : pointer_to_current_node(ptr), sort(sort), index(0)
             {
+                vec.clear();
+                if (ptr)
+                {
+                    if (sort == 1)
+                    {
+                        createPreorderVec(&pointer_to_current_node, vec);
+                    }
+                    if (sort == 2)
+                    {
+                        createInorderVec(&pointer_to_current_node, vec);
+                    }
+                    if (sort == 3)
+                    {
+                        createpostorderVec(&pointer_to_current_node, vec);
+                    }
+                }
+                vec.push_back(nullptr);
+                pointer_to_current_node = vec.at(0);
             }
 
             T &operator*() const
@@ -68,14 +284,15 @@ namespace ariel
 
             iterator &operator++()
             {
-                pointer_to_current_node = pointer_to_current_node->left;
+                index++;
+                pointer_to_current_node = vec.at(index);
                 return *this;
             }
 
             const iterator operator++(int)
             {
-                iterator temp = *this;
-                pointer_to_current_node = pointer_to_current_node->left;
+                iterator temp = vec.at(index);
+                pointer_to_current_node = vec.at(++index);
                 return temp;
             }
 
@@ -86,149 +303,50 @@ namespace ariel
 
             bool operator!=(const iterator &it) const
             {
-                return pointer_to_current_node != it.pointer_to_current_node;
+                return !(pointer_to_current_node == it.pointer_to_current_node);
             }
-
-            friend std::ostream &operator<<(std::ostream &os, const BinaryTree &b);
         };
-        // begin_preorder(), end_preorder()
-        // begin_inorder(), end_inorder()
-        // begin_postorder(), end_postorder()
-        // אופרטור פלט
+
         iterator begin()
         {
-            return iterator(root);
+            return begin_inorder();
         }
 
         iterator end()
         {
-            return iterator(root);
+            return iterator(nullptr);
         }
 
         iterator begin_preorder()
         {
-            return iterator(root);
+            return iterator{root, 1};
         }
 
         iterator end_preorder()
         {
-            return iterator(root);
+            return iterator(nullptr);
         }
 
         iterator begin_inorder()
         {
-            return iterator(root);
+            return iterator{root, 2};
         }
 
         iterator end_inorder()
         {
-            return iterator(root);
+            return iterator(nullptr);
         }
 
         iterator begin_postorder()
         {
-            return iterator(root);
+            return iterator{root, 3};
         }
 
         iterator end_postorder()
         {
-            return iterator(root);
+            return iterator(nullptr);
         }
     };
-    template <typename T>
-    BinaryTree<T>::BinaryTree()
-    {
-        root = nullptr;
-    }
-
-    template <typename T>
-    Node<T> &BinaryTree<T>::get_root()
-    {
-        if (this->root)
-        {
-            return *this->root;
-        }
-        throw("there is no root for this tree");
-    }
-
-    template <typename T>
-    BinaryTree<T> &BinaryTree<T>::add_root(T i)
-    {
-        // if(this->root == nullptr){
-        //     this->root.data = i;
-        return *this;
-        // }
-        // Node<T> temp = new Node<T>(i);
-        // this->root = temp;
-        // return temp;
-    }
-
-    template <typename T>
-    BinaryTree<T> &BinaryTree<T>::add_left(T i, T j)
-    {
-        return *this;
-    }
-
-    template <typename T>
-    BinaryTree<T> &BinaryTree<T>::add_right(T i, T j)
-    {
-        return *this;
-    }
-
-    template <typename T>
-    bool contains(Node<T> *root, T n)
-    {
-        // if (root->data == nullptr)
-        // {
-        //     return false;
-        // }
-        // if (root->data == n)
-        // {
-        //     return true;
-        // }
-        // else
-        // {
-        //     if (root->left != nullptr)
-        //     {
-        //         return (containSub(root->left, n));
-        //     }
-        //     if (root->right != NULL)
-        //     {
-        //         return (containSub(root->right, n));
-        //     }
-        // }
-        return false;
-    }
-
-    template <typename T>
-    bool containSub(Node<T> curNode, T n)
-    {
-        if (curNode.data == nullptr)
-        {
-            return false;
-        }
-        if (curNode.data == n)
-        {
-            return true;
-        }
-        else
-        {
-            if (curNode.left != nullptr)
-            {
-                return (containSub(curNode.left, n));
-            }
-            if (curNode.right != nullptr)
-            {
-                return (containSub(curNode.right, n));
-            }
-        }
-        return false;
-    }
-
-    template <typename T>
-    std::ostream &operator<<(std::ostream &os, const BinaryTree<T> &bt)
-    {
-        return os;
-    }
 }
 #endif
+
