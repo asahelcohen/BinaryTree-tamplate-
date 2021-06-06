@@ -76,7 +76,7 @@ namespace ariel
                 }
                 return *this;
             }
-            Node(Node &&other)
+            Node(Node &&other) noexcept
             {
                 data = other.data;
                 left = other.left;
@@ -85,14 +85,16 @@ namespace ariel
                 other.left = nullptr;
                 other.right = nullptr;
             }
-            Node &operator=(Node &&other)
+            Node &operator=(Node &&other) noexcept
             {
                 if (left)
+                {
                     delete left;
+                }
                 if (right)
+                {
                     delete right;
-                if (data)
-                    delete data;
+                }
                 data = other.data;
                 left = other.left;
                 right = other.right;
@@ -175,7 +177,9 @@ namespace ariel
                     temp->left = new Node(j);
                 }
                 else
+                {
                     temp->left->data = j;
+                }
                 return *this;
             }
             throw("tree does not contain node");
@@ -190,45 +194,47 @@ namespace ariel
                     temp->right = new Node(j);
                 }
                 else
+                {
                     temp->right->data = j;
+                }
                 return *this;
             }
             throw("tree does not contain node");
         }
+
         ~BinaryTree() { delete root; }
 
-        BinaryTree(const BinaryTree &unq) : root(unq.root)
+        BinaryTree(const BinaryTree &unq)
         {
-            if (unq.root)
-            {
-                root = new Node(*unq.right);
-            }
-            else
-            {
-                root = nullptr;
-            }
+            root = new Node(*unq.root);
         }
-        Node &operator=(Node other)
+        BinaryTree &operator=(BinaryTree other) noexcept
         {
             if (this != &other)
             {
-
                 delete root;
-                root = other.root;
+                root = new Node(*other.root);
             }
             return *this;
         }
-        BinaryTree(BinaryTree &&other)
+        BinaryTree(BinaryTree &&other) noexcept
         {
+            if (root)
+            {
+                delete root;
+            }
             root = other.root;
             other.root = nullptr;
         }
-        BinaryTree &operator=(BinaryTree &&other)
+        BinaryTree &operator=(BinaryTree &&other) noexcept
         {
             if (root)
+            {
                 delete root;
+            }
             root = other.root;
             other.root = nullptr;
+            return *this;
         }
 
         friend std::ostream &operator<<(std::ostream &os, const BinaryTree<T> &bt)
@@ -284,9 +290,9 @@ namespace ariel
                 return *this;
             }
 
-            const iterator operator++(int)
+            iterator operator++(int)
             {
-                iterator temp = vec.at(index);
+                iterator temp = *this;
                 pointer_to_current_node = vec.at(++index);
                 return temp;
             }

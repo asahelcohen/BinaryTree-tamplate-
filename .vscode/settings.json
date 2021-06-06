@@ -14,6 +14,8 @@
         "functional": "cpp",
         "tuple": "cpp",
         "random": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp"
     }
 }
